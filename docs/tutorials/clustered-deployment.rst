@@ -30,7 +30,7 @@ Now that we have all of the Docker dependencies installed, we can create a Docke
 
     In the following steps we'll be running each Docker container in detached mode.  However, we'll also demonstrate how access the logs for a running container.  If you prefer to run the containers in the foreground, you can do so by replacing the ``-d`` flags with ``--it``. 
 
-1. Create and configure the Docker machine.
+1. Create and configure the Docker machine (OS X only).
 
   .. sourcecode:: bash
 
@@ -51,7 +51,6 @@ Now that we have all of the Docker dependencies installed, we can create a Docke
        --name=zk-1 \
        -e ZOOKEEPER_SERVER_ID=1 \
        -e ZOOKEEPER_CLIENT_PORT=22181 \
-       -e ZOOKEEPER_TICK_TIME=2000 \
        -e ZOOKEEPER_INIT_LIMIT=5 \
        -e ZOOKEEPER_SYNC_LIMIT=2 \
        -e ZOOKEEPER_SERVERS="localhost:22888:23888;localhost:32888:33888;localhost:42888:43888" \
@@ -62,7 +61,6 @@ Now that we have all of the Docker dependencies installed, we can create a Docke
        --name=zk-2 \
        -e ZOOKEEPER_SERVER_ID=2 \
        -e ZOOKEEPER_CLIENT_PORT=32181 \
-       -e ZOOKEEPER_TICK_TIME=2000 \
        -e ZOOKEEPER_INIT_LIMIT=5 \
        -e ZOOKEEPER_SYNC_LIMIT=2 \
        -e ZOOKEEPER_SERVERS="localhost:22888:23888;localhost:32888:33888;localhost:42888:43888" \
@@ -73,7 +71,6 @@ Now that we have all of the Docker dependencies installed, we can create a Docke
        --name=zk-3 \
        -e ZOOKEEPER_SERVER_ID=3 \
        -e ZOOKEEPER_CLIENT_PORT=42181 \
-       -e ZOOKEEPER_TICK_TIME=2000 \
        -e ZOOKEEPER_INIT_LIMIT=5 \
        -e ZOOKEEPER_SYNC_LIMIT=2 \
        -e ZOOKEEPER_SERVERS="localhost:22888:23888;localhost:32888:33888;localhost:42888:43888" \
@@ -207,7 +204,7 @@ Now that we have all of the Docker dependencies installed, we can create a Docke
     docker run \
       --net=host \
       --rm confluentinc/cp-kafka:3.0.1 \
-      bash -c "seq 42 | kafka-console-producer --broker-list localhost:29092 --topic bar && echo 'Produced 42 messages.'"
+      bash -c "seq 42 | kafka-console-producer --request-required-acks 1 --broker-list localhost:29092 --topic bar && echo 'Produced 42 messages.'"
 
   The command above will pass 42 integers using the Console Producer that is shipped with Kafka.  As a result, you should see something like this in your terminal:
 
@@ -247,7 +244,19 @@ Docker Compose: Setting Up a Three Node Kafka Cluster
 
 Before you get started, you will first need to install `Docker <https://docs.docker.com/engine/installation/>`_ and `Docker Compose <https://docs.docker.com/compose/install/>`_.  Once you've done that, you can follow the steps below to start up the Confluent Platform services.
 
-1. Clone the CP Docker Images Github Repository.
+1. Create and configure the Docker machine (OS X only).
+
+  .. sourcecode:: bash
+
+    docker-machine create --driver virtualbox --virtualbox-memory 6000 confluent
+
+  Next, configure your terminal window to attach it to your new Docker Machine:
+
+  .. sourcecode:: bash
+
+    eval $(docker-machine env confluent)
+
+2. Clone the CP Docker Images Github Repository.
 
   .. sourcecode:: bash
 
@@ -258,7 +267,7 @@ Before you get started, you will first need to install `Docker <https://docs.doc
   .. sourcecode:: bash       
     cd cp-docker-images/examples/kafka-cluster
 
-2. Start Zookeeper and Kafka using Docker Compose ``up`` command.
+3. Start Zookeeper and Kafka using Docker Compose ``up`` command.
 
    .. sourcecode:: bash
 
@@ -340,4 +349,4 @@ Before you get started, you will first need to install `Docker <https://docs.doc
        kafka-3_1      | [2016-07-25 04:58:15,369] INFO [Controller-3-to-broker-1-send-thread], Controller 3 connected to localhost:19092 (id: 1 rack: null) for sending state change requests (kafka.controller.RequestSendThread)
        kafka-3_1      | [2016-07-25 04:58:15,369] INFO [Controller-3-to-broker-1-send-thread], Controller 3 connected to localhost:19092 (id: 1 rack: null) for sending state change requests (kafka.controller.RequestSendThread)
 
-3. Follow section 4 in the "Docker Client" section above to test that your brokers are functioning as expected.
+4. Follow section 4 in the "Docker Client" section above to test that your brokers are functioning as expected.
