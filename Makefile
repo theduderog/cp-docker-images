@@ -8,7 +8,9 @@ MYSQL_DRIVER_VERSION := 5.1.39
 CONFLUENT_DEB_REPO := http://packages.confluent.io
 APT_ALLOW_UNAUTHENTICATED := false
 REPOSITORY := confluentinc
-#	REPOSITORY := <your_personal_repo>
+
+# You can override vars like REPOSITORY in a local.make file
+-include local.make
 
 clean-containers:
 	for container in `docker ps -aq -f label=io.confluent.docker.testing=true` ; do \
